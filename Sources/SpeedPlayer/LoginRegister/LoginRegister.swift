@@ -24,9 +24,12 @@ struct LoginRegister {
         let login = Login()
         let register = Register()
         let info = Info()
+        let updateInfo = UpdateInfo()
+        
         baseRoutes.add(login.start())
         baseRoutes.add(register.start())
         baseRoutes.add(info.start())
+        baseRoutes.add(updateInfo.start())
         return baseRoutes
     }
     
@@ -170,8 +173,53 @@ struct LoginRegister {
                         return;
                     }
                     let info =  user.rows().first!
-                    let data:[String : Any] = ["mobile":info.mobile,"name":info.name,"userId":info.id,"avatar":info.avatar]
+                    let data:[String : Any] = ["mobile":info.mobile,"name":info.name,"userId":info.id,"avatar":info.avatar,"email":info.email]
                     let body = Tools.responseJson(data:data , txt: nil, status:.success)
+                    try response.setBody(json:body)
+                    
+                    
+                }catch{
+                    LogFile.error("\(error)")
+                    let _ = try? response.setBody(json:Tools.responseJson(data: [:], txt: nil, status: nil, code: .defaultError, msg: "请求失败"))
+                }
+            }
+            
+            return route
+        }
+        
+    }
+    /// 更新个人信息
+    struct UpdateInfo {
+        func start() -> Route {
+            let route = Route(method: .get, uri: "/updateInfo") { (request, response) in
+                defer{
+                    response.completed()
+                }
+                
+                let user = User()
+                
+                do{
+                    let json = try request.postParams.first!.0.jsonDecode() as! [String:Any]
+                    let data = json["data"] as! [String:Any]
+                    try user.find([("id",data["userId"] ?? 0)])
+                    guard user.rows().count > 0 else {
+                        let body = Tools.responseJson(data: [:], txt: "该用户不存在或者已禁用", status:.defaulErrortStatus)
+                        try response.setBody(json:body)
+                        return;
+                    }
+                    let info =  user.rows().first!
+                    if let name = data["name"] as? String{
+                        info.name = name
+                    }
+                    if let mobile = data["mobile"] as? String {
+                        info.name = mobile
+                    }
+                    if let email = data["email"] as? String {
+                        info.email = email
+                    }
+                    try info.save()
+                    let responseData:[String : Any] = ["mobile":info.mobile,"name":info.name,"userId":info.id,"avatar":info.avatar]
+                    let body = Tools.responseJson(data:responseData , txt: nil, status:.success)
                     try response.setBody(json:body)
                     
                     

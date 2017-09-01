@@ -9,6 +9,7 @@ import MySQL
 import PerfectLib
 import PerfectCrypto
 import PerfectLogger
+import PerfectHTTP
 let HandleSuccessTxt = "处理成功"
 let HandleFailedTxt = "处理失败"
 let ResponseSuccessMsg = "请求成功"
@@ -34,12 +35,25 @@ class Tools {
         
         if code == .success {
             var tempData = data
+//            for item in tempData {
+//                if let value = item.value as? String,value == "nil"{
+//                    tempData[item.key] = "<null>"
+//                }
+//                
+//            }
+
+//            过滤nil
+            var keys = [String]()
             for item in tempData {
                 if let value = item.value as? String,value == "nil"{
-                    tempData[item.key] = "<null>"
+                    keys.append(item.key)
                 }
                 
             }
+            for key in keys {
+                tempData.removeValue(forKey: key)
+            }
+            
             tempData["txt"] = txt
             tempData["status"] = status?.rawValue
             json["data"] = tempData
@@ -155,4 +169,15 @@ extension MySQL {
     }
     
     
+}
+extension HTTPResponse {
+    @discardableResult
+    func setBodyNullable(json: JSONConvertible, skipContentType: Bool = false) throws -> Self {
+        let string = try json.jsonEncodedString()
+        if !skipContentType {
+            setHeader(.contentType, value: "application/json")
+        }
+        let replacStr = string.replacingOccurrences(of: "\"nil\"", with: "null");
+        return setBody(string: replacStr)
+    }
 }
