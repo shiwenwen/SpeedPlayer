@@ -7,7 +7,7 @@
 //
 import MySQL
 import PerfectLib
-import CryptoSwift
+import PerfectCrypto
 import PerfectLogger
 let HandleSuccessTxt = "处理成功"
 let HandleFailedTxt = "处理失败"
