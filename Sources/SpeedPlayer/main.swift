@@ -22,7 +22,7 @@ import PerfectHTTPServer
 import MySQLStORM
 import PerfectRequestLogger
 import PerfectLogger
-
+import PerfectCrypto
 // 初始化一个日志记录器
 let myLogger = RequestLogger()
 RequestLogFile.location = "./log.log"
@@ -32,8 +32,8 @@ MySQLConnector.password = Sql_passwoed
 MySQLConnector.port = Sql_port
 MySQLConnector.database = Sql_db
 
-
-
+// 初始化加密
+PerfectCrypto.isInitialized = true
 
 var server = HTTPServer()
 server.serverName = "localhost"

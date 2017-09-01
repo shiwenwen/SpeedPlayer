@@ -61,8 +61,9 @@ class Tools {
             
         }
         if let paramsString = try? params.jsonEncodedString() {
-            
-            let md5 = (paramsString + MD5_KEY).md5()
+            guard let md5Byte = (paramsString + MD5_KEY).digest(.md5),let md5 = String(validatingUTF8:md5Byte) else {
+                return false
+            }
             LogFile.info("originString = \(paramsString)---sign = \(md5)")
             if md5 != sign{
                 

@@ -10,7 +10,6 @@ import PerfectHTTPServer
 import PerfectHTTP
 import MySQLStORM
 import PerfectLogger
-import CryptoSwift
 
 
 
