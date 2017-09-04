@@ -174,7 +174,7 @@ struct LoginRegister {
                     }
                     let info =  user.rows().first!
                     let data:[String : Any] = ["mobile":info.mobile,"name":info.name,"userId":info.id,"avatar":info.avatar,"email":info.email]
-                    let body = Tools.responseJson(data:data , txt: nil, status:.success)
+                    let body = Tools.responseJson(data:data)
                     try response.setBody(json:body)
                     
                     
@@ -191,7 +191,7 @@ struct LoginRegister {
     /// 更新个人信息
     struct UpdateInfo {
         func start() -> Route {
-            let route = Route(method: .get, uri: "/updateInfo") { (request, response) in
+            let route = Route(method: .post, uri: "/updateInfo") { (request, response) in
                 defer{
                     response.completed()
                 }
@@ -201,7 +201,12 @@ struct LoginRegister {
                 do{
                     let json = try request.postParams.first!.0.jsonDecode() as! [String:Any]
                     let data = json["data"] as! [String:Any]
-                    try user.find([("id",data["userId"] ?? 0)])
+                    guard let userId = data["userId"] else {
+                        let body = Tools.responseJson(data: [:], txt: "该用户不存在或者已禁用", status:.defaulErrortStatus)
+                        try response.setBody(json:body)
+                        return
+                    }
+                    try user.find([("id","\(userId)")])
                     guard user.rows().count > 0 else {
                         let body = Tools.responseJson(data: [:], txt: "该用户不存在或者已禁用", status:.defaulErrortStatus)
                         try response.setBody(json:body)
@@ -219,7 +224,7 @@ struct LoginRegister {
                     }
                     try info.save()
                     let responseData:[String : Any] = ["mobile":info.mobile,"name":info.name,"userId":info.id,"avatar":info.avatar]
-                    let body = Tools.responseJson(data:responseData , txt: nil, status:.success)
+                    let body = Tools.responseJson(data:responseData)
                     try response.setBody(json:body)
                     
                     
