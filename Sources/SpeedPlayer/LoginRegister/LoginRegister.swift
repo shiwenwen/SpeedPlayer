@@ -45,21 +45,21 @@ struct LoginRegister {
                 let user = User()
                 
                 do{
-                    try user.find([("mobile",data["mobile"]!)])
+                    try user.find([("mobile",data["mobile"] ?? "")])
                     guard user.rows().count > 0 else{
                         let body = Tools.responseJson(data: [:], txt: "该手机号未注册", status:.mobileHasNoRegister)
                         try response.setBody(json:body)
                         return;
                     }
-                    try user.find([("uuid",data["uuid"]!)])
+                    try user.find([("uuid",data["uuid"] ?? "")])
                     var isRegsitDevice = false
                     for us in user.rows() {
                         if us.uuid == data["uuid"] as! String {
                             isRegsitDevice = true
                         }
                     }
-                    try user.find([("mobile",data["mobile"]!)])
-                    if isRegsitDevice || (data["reset"] as! Int) == 1{
+                    try user.find([("mobile",data["mobile"] ?? "")])
+                    if isRegsitDevice || (data["reset"] as? Int ?? 1) == 1{
                         let account =  user.rows().first!
                         if account.password == data["password"] as! String {
                             let body = Tools.responseJson(data: ["mobile":account.mobile,"name":account.name,"userId":account.id], txt: "登录成功", status:.success)
@@ -102,13 +102,13 @@ struct LoginRegister {
                 let user = User()
                 
                 do{
-                    try user.find([("mobile",data["mobile"]!)])
+                    try user.find([("mobile",data["mobile"] ?? "")])
                     if user.results.foundSetCount > 0 {
                         let body = Tools.responseJson(data: [:], txt: "该手机号已经注册", status:.mobileHasRegister)
                         try response.setBody(json:body)
                         return;
                     }
-                    try user.find([("authCode",data["authCode"]!)])
+                    try user.find([("authCode",data["authCode"] ?? "")])
                     if user.results.foundSetCount > 0 {
                         let body = Tools.responseJson(data: [:], txt: "该邀请码已经注册", status:.authCodeUsed)
                         try response.setBody(json:body)
@@ -116,7 +116,7 @@ struct LoginRegister {
                     }
                     let authCodeManager = AuthCode()
                     
-                    try authCodeManager.find([("authCode",data["authCode"]!)])
+                    try authCodeManager.find([("authCode",data["authCode"] ?? "")])
                     guard authCodeManager.results.foundSetCount > 0 else {
                         let body = Tools.responseJson(data: [:], txt: "该邀请码无效", status:.authCodeNotFound)
                         try response.setBody(json:body)
@@ -126,12 +126,12 @@ struct LoginRegister {
                         row.status = 1
                         try row.save()
                     }
-                    user.name = data["name"] as! String
-                    user.mobile = data["mobile"] as! String
-                    user.authCode = data["authCode"] as! String
-                    user.uuid = data["uuid"] as! String
-                    let password = data["password"] as! String
-                    user.email = data["email"] as! String
+                    user.name = data["name"] as? String ?? ""
+                    user.mobile = data["mobile"] as? String ?? ""
+                    user.authCode = data["authCode"] as? String ?? ""
+                    user.uuid = data["uuid"] as? String ?? ""
+                    let password = data["password"] as? String ?? ""
+                    user.email = data["email"] as? String ?? ""
                     user.password = password
                     try user.save(set: { (id) in
                         user.id = id as! Int
@@ -166,7 +166,7 @@ struct LoginRegister {
                 let user = User()
                 
                 do{
-                    try user.find([("id",request.param(name: "userId")!)])
+                    try user.find([("id",request.param(name: "userId",defaultValue: "0")!)])
                     guard user.rows().count > 0 else {
                         let body = Tools.responseJson(data: [:], txt: "该用户不存在或者已禁用", status:.defaulErrortStatus)
                         try response.setBody(json:body)
