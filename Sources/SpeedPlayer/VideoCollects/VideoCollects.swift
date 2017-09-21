@@ -120,7 +120,8 @@ struct VideoCollects {
                         ]
                         collectsArrary.append(colDic)
                     }
-                    let body = Tools.responseJson(data: ["collects":collectsArrary])
+                    try videoCollect.select(whereclause: "userId = ?", params: [userId], orderby: [])
+                    let body = Tools.responseJson(data: ["collects":collectsArrary,"total":videoCollect.results.foundSetCount])
                     try response.setBody(json:body)
                     return
                 }catch{
