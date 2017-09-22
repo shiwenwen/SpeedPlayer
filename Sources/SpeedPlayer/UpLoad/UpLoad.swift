@@ -143,11 +143,11 @@ struct UpLoad {
                             return;
                         }
                         let info =  user.rows().first!
-                        let url = Local_Host+"/files/userData/info/avatars/"+ upload["fileName"] as! String
+                        let url = Local_Host+"/files/userData/info/avatars/" + ( upload["fileName"] as! String )
                         info.avatar = url
                         try info.save()
                         try response.setBody(json: Tools.responseJson(data:["avatar":url]))
-                        LogFile.info("文件上传成功:\(fileDir.path + upload["fileName"] as! String)")
+                        LogFile.info("文件上传成功:\(fileDir.path + ( upload["fileName"] as! String ))")
                     } catch {
                         LogFile.error("\(error)")
                         let _ = try? response.setBody(json:Tools.responseJson(data: [:], txt: nil, status: nil, code: .defaultError, msg: "处理失败\(error)"))
