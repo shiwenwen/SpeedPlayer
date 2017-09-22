@@ -223,7 +223,7 @@ struct LoginRegister {
                         info.email = email
                     }
                     try info.save()
-                    let responseData:[String : Any] = ["mobile":info.mobile,"name":info.name,"userId":info.id,"avatar":info.avatar]
+                    let responseData:[String : Any] = ["mobile":info.mobile,"name":info.name,"userId":info.id,"avatar":info.avatar,"email":info.email]
                     let body = Tools.responseJson(data:responseData)
                     try response.setBody(json:body)
                     
