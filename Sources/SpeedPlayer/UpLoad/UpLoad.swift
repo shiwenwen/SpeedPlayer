@@ -98,8 +98,8 @@ struct UpLoad {
                 }
                 if let uploads = request.postFileUploads, uploads.count > 0 {
                     // 创建一个字典数组用于检查已经上载的内容
-//                    var ary = [[String:Any]]()
-                    var ary = [MimeReader.BodySpec]()
+                    var ary = [[String:Any]]()
+//                    var ary = [MimeReader.BodySpec]()
                     
                     var userId:String = ""
                     for upload in uploads {
@@ -107,14 +107,14 @@ struct UpLoad {
                         // 是文件
                         if upload.fileSize > 0 {
                             
-//                            ary.append([
-//                                "fieldName": upload.fieldName,  //字段名
-//                                "contentType": upload.contentType, //文件内容类型
-//                                "fileName": upload.fileName,    //文件名
-//                                "fileSize": upload.fileSize,    //文件尺寸
-//                                "tmpFileName": upload.tmpFileName   //上载后的临时文件名
-//                                ])
-                            ary.append(upload)
+                            ary.append([
+                                "fieldName": upload.fieldName,  //字段名
+                                "contentType": upload.contentType, //文件内容类型
+                                "fileName": upload.fileName,    //文件名
+                                "fileSize": upload.fileSize,    //文件尺寸
+                                "tmpFileName": upload.tmpFileName   //上载后的临时文件名
+                                ])
+//                            ary.append(upload)
                         } else {
                             if upload.fieldName == "data[userId]" || upload.fieldName == "userId" {
                                 userId = upload.fieldValue
@@ -132,8 +132,8 @@ struct UpLoad {
                             return;
                         }
                         let upload = ary.first!
-                        let thisFile = File(upload.tmpFileName)
-                        let _ = try thisFile.moveTo(path: fileDir.path + upload.fileName, overWrite: true)
+                        let thisFile = File(upload["tmpFileName"] as! String )
+                        let _ = try thisFile.moveTo(path: fileDir.path + ( upload["fileName"] as! String ), overWrite: true)
                         
                         let user = User()
                         try user.find([("id",userId)])
@@ -143,11 +143,11 @@ struct UpLoad {
                             return;
                         }
                         let info =  user.rows().first!
-                        let url = Local_Host+"/files/userData/info/avatars/"+upload.fileName
+                        let url = Local_Host+"/files/userData/info/avatars/"+ upload["fileName"] as! String
                         info.avatar = url
                         try info.save()
                         try response.setBody(json: Tools.responseJson(data:["avatar":url]))
-                        LogFile.info("文件上传成功:\(fileDir.path + upload.fileName)")
+                        LogFile.info("文件上传成功:\(fileDir.path + upload["fileName"] as! String)")
                     } catch {
                         LogFile.error("\(error)")
                         let _ = try? response.setBody(json:Tools.responseJson(data: [:], txt: nil, status: nil, code: .defaultError, msg: "处理失败\(error)"))
