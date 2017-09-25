@@ -38,7 +38,7 @@ struct VideoCollects {
                     response.completed()
                 }
                 
-                let userId = request.param(name: "userId")!
+                let userId = request.param(name: "userId",defaultValue: "0")!
                 do{
                     let videoCollect = VideoCollect()
                     try videoCollect.find([("userId",userId)])
@@ -63,8 +63,8 @@ struct VideoCollects {
                     response.completed()
                 }
                 
-                let userId = request.param(name: "userId")!
-                let videoId = request.param(name: "videoId")!
+                let userId = request.param(name: "userId", defaultValue: "0")!
+                let videoId = request.param(name: "videoId", defaultValue: "0")!
                 do{
                     let videoCollect = VideoCollect()
                     try videoCollect.find([("userId",userId),("videoId",videoId)])
@@ -88,7 +88,7 @@ struct VideoCollects {
                 defer{
                     response.completed()
                 }
-                let userId = request.param(name: "userId")!
+                let userId = request.param(name: "userId",defaultValue: "0")!
                 let pageNum = request.param(name: "pageNum", defaultValue: "0")!
                 let pageSize = request.param(name: "pageSize", defaultValue: "50")!
                 do{
@@ -149,20 +149,20 @@ struct VideoCollects {
                 do{
                     let collectsArray = data["collects"] as! [[String:Any]]
                     for col in collectsArray {
-                        let userId = col["userId"] as! Int
-                        let videoId = col["videoId"] as! String
-                        let barcode = col["barcode"] as! String
-                        let title = col["title"] as! String
-                        let sys_ctime = col["sys_ctime"] as! String
-                        let cover = col["cover"] as! String
-                        let playcover = col["playcover"] as! String
-                        let category = col["category"] as! String
-                        let startdate = col["startdate"] as! String
-                        let up_time = col["up_time"] as! String
-                        let player = col["player"] as! String
-                        let play_count = col["play_count"] as! String
-                        let cat = col["cat"] as! String
-                        let cat_text = col["cat_text"] as! String
+                        let userId = col["userId"] as? Int ?? 0
+                        let videoId = col["videoId"] as? String ?? ""
+                        let barcode = col["barcode"] as? String ?? ""
+                        let title = col["title"] as? String ?? ""
+                        let sys_ctime = col["sys_ctime"] as? String ?? ""
+                        let cover = col["cover"] as? String ?? ""
+                        let playcover = col["playcover"] as? String ?? ""
+                        let category = col["category"] as? String ?? ""
+                        let startdate = col["startdate"] as? String ?? ""
+                        let up_time = col["up_time"] as? String ?? ""
+                        let player = col["player"] as? String ?? ""
+                        let play_count = col["play_count"] as? String ?? ""
+                        let cat = col["cat"] as? String ?? ""
+                        let cat_text = col["cat_text"] as? String ?? ""
                         let videoCollect = VideoCollect()
                         videoCollect.userId = userId
                         videoCollect.videoId = videoId
