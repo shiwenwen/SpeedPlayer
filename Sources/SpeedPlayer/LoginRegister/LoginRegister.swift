@@ -217,7 +217,7 @@ struct LoginRegister {
                         info.name = name
                     }
                     if let mobile = data["mobile"] as? String {
-                        info.name = mobile
+                        info.mobile = mobile
                     }
                     if let email = data["email"] as? String {
                         info.email = email
