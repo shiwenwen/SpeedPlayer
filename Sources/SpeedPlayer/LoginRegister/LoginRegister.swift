@@ -10,7 +10,7 @@ import PerfectHTTPServer
 import PerfectHTTP
 import MySQLStORM
 import PerfectLogger
-
+import Foundation
 
 
 
@@ -92,6 +92,7 @@ struct LoginRegister {
     /// 注册
     struct Register {
         func start() -> Route {
+            
             let route = Route(method: .post, uri: "/register") { (request, response) in
                 
                 defer{
@@ -133,6 +134,9 @@ struct LoginRegister {
                     let password = data["password"] as? String ?? ""
                     user.email = data["email"] as? String ?? ""
                     user.password = password
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+                    user.create_time = formatter.string(from: Date())
                     try user.save(set: { (id) in
                         user.id = id as! Int
                     })

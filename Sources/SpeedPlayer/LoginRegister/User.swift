@@ -8,6 +8,7 @@
 
 import MySQLStORM
 import StORM
+
 class User: MySQLStORM {
     var id : Int = 0
     var name : String = ""
@@ -17,6 +18,7 @@ class User: MySQLStORM {
     var uuid : String = ""
     var email : String = ""
     var avatar : String = ""
+    var create_time : String = ""
     
     override func table() -> String {
         return Sql_Users_table
@@ -35,7 +37,7 @@ class User: MySQLStORM {
         uuid = this.data["uuid"] as? String ?? ""
         email = this.data["email"] as! String
         avatar = this.data["avatar"] as? String ?? "nil"
-        
+        create_time = this.data["create_time"] as? String ?? ""
     }
     
     func rows() -> [User] {
