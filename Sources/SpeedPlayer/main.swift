@@ -60,8 +60,8 @@ var routes = Routes(baseUri: baseUrl)
 routes.add(LoginRegister.start())
 //文件上传
 routes.add(UpLoad.start())
-//邀请码管理
-routes.add(AuthCodeManager.start())
+//订单号管理
+routes.add(TradeNoManager.start())
 //收藏
 routes.add(VideoCollects.start())
 

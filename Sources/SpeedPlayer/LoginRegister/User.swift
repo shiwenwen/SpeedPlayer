@@ -14,12 +14,14 @@ class User: MySQLStORM {
     var name : String = ""
     var mobile : String = ""
     var password : String = ""
-    var authCode : String = ""
     var uuid : String = ""
     var email : String = ""
     var avatar : String = ""
     var create_time : String = ""
-    
+    var recharge_time : String = ""
+    var isPermanent : Int = 0
+    var status : Int = 0
+    var tradeNo : String = ""
     override func table() -> String {
         return Sql_Users_table
     }
@@ -33,12 +35,23 @@ class User: MySQLStORM {
         name = this.data["name"] as! String
         mobile = this.data["mobile"] as! String
         password = this.data["password"] as! String
-        authCode = this.data["authCode"] as! String
         uuid = this.data["uuid"] as? String ?? ""
         email = this.data["email"] as! String
         avatar = this.data["avatar"] as? String ?? "nil"
         avatar = avatar.characters.count < 1 ? "nil" : avatar
         create_time = this.data["create_time"] as? String ?? ""
+        recharge_time = this.data["recharge_time"] as? String ?? ""
+        if this.data["isPermanent"] is Int32 {
+            isPermanent = Int(this.data["isPermanent"] as! Int32)
+        }else{
+            isPermanent = this.data["isPermanent"] as! Int
+        }
+        if this.data["status"] is Int32 {
+            status = Int(this.data["status"] as! Int32)
+        }else{
+            status = this.data["status"] as! Int
+        }
+        tradeNo = this.data["tradeNo"] as? String ?? ""
     }
     
     func rows() -> [User] {

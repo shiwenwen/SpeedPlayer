@@ -11,8 +11,7 @@ import PerfectHTTP
 import MySQLStORM
 import PerfectLogger
 import Foundation
-
-
+import PerfectSMTP
 
 struct LoginRegister {
     
@@ -51,14 +50,18 @@ struct LoginRegister {
                         try response.setBody(json:body)
                         return;
                     }
-                    try user.find([("uuid",data["uuid"] ?? "")])
+                    if user.rows().first!.status < 1 {
+                        let body = Tools.responseJson(data: [:], txt: "该账号使用了错误的订单号,已经被禁用!", status:.forbidden)
+                        try response.setBody(json:body)
+                        return;
+                    }
                     var isRegsitDevice = false
                     for us in user.rows() {
-                        if us.uuid == data["uuid"] as! String {
+                        if us.uuid == data["uuid"] as? String {
                             isRegsitDevice = true
                         }
                     }
-                    try user.find([("mobile",data["mobile"] ?? "")])
+                    
                     if isRegsitDevice || (data["reset"] as? Int ?? 1) == 1{
                         let account =  user.rows().first!
                         if account.password == data["password"] as! String {
@@ -101,45 +104,53 @@ struct LoginRegister {
                 let json = try! request.postParams.first!.0.jsonDecode() as! [String:Any]
                 let data = json["data"] as! [String:Any]
                 let user = User()
-                
+                let blackList = BlackList()
                 do{
+                    try blackList.find([("uuid",data["uuid"] as? String ?? "")])
+                    if blackList.results.foundSetCount > 0 && blackList.rows().first!.errorCount > 2 {
+                        let body = Tools.responseJson(data: [:], txt: "该手机由于恶意注册已被封，不得再注册", status:.inBlackList)
+                        try response.setBody(json:body)
+                        return;
+                        
+                    }
                     try user.find([("mobile",data["mobile"] ?? "")])
                     if user.results.foundSetCount > 0 {
                         let body = Tools.responseJson(data: [:], txt: "该手机号已经注册", status:.mobileHasRegister)
                         try response.setBody(json:body)
                         return;
                     }
-                    try user.find([("authCode",data["authCode"] ?? "")])
-                    if user.results.foundSetCount > 0 {
-                        let body = Tools.responseJson(data: [:], txt: "该邀请码已经注册", status:.authCodeUsed)
+                    let tradeNo = TradeNo()
+                    try tradeNo.find([("trade_no",data["tradeNo"] ?? "")])
+                    if tradeNo.results.foundSetCount > 0 {
+                        let body = Tools.responseJson(data: [:], txt: "该订单号已经使用", status:.tradeNoUsed)
                         try response.setBody(json:body)
                         return;
                     }
-                    let authCodeManager = AuthCode()
                     
-                    try authCodeManager.find([("authCode",data["authCode"] ?? "")])
-                    guard authCodeManager.results.foundSetCount > 0 else {
-                        let body = Tools.responseJson(data: [:], txt: "该邀请码无效", status:.authCodeNotFound)
-                        try response.setBody(json:body)
-                        return;
-                    }
-                    for row in authCodeManager.rows() {
-                        row.status = 1
-                        try row.save()
-                    }
+                    
                     user.name = data["name"] as? String ?? ""
                     user.mobile = data["mobile"] as? String ?? ""
-                    user.authCode = data["authCode"] as? String ?? ""
+                    user.tradeNo = data["tradeNo"] as? String ?? ""
                     user.uuid = data["uuid"] as? String ?? ""
                     let password = data["password"] as? String ?? ""
                     user.email = data["email"] as? String ?? ""
                     user.password = password
+                    user.isPermanent = 0
+                    user.status = 0
                     let formatter = DateFormatter()
                     formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-                    user.create_time = formatter.string(from: Date())
+                    let dataStr = formatter.string(from: Date())
+                    user.create_time = dataStr
+                    user.recharge_time = dataStr
+                    
+                    tradeNo.trade_no = data["tradeNo"] as? String ?? ""
+                    tradeNo.create_time = dataStr
+                    try tradeNo.save()
+                    
                     try user.save(set: { (id) in
                         user.id = id as! Int
                     })
+                    self.sendEmail(content: data ,time: dataStr)
                     let body = Tools.responseJson(data: [
                         "name":user.name,
                         "mobile":user.mobile,
@@ -156,6 +167,34 @@ struct LoginRegister {
             }
             
             return route
+        }
+        //MARK:  发送邮件
+         func sendEmail(content: [String : Any],time: String) {
+            let client = SMTPClient(url: emailServer, username: emailAddress, password: emailPsd)
+            let email = EMail(client: client)
+            email.subject = "新用户注册\(content["mobile"] as? String ?? "")"
+            let recipient = Recipient(name: "shiwenwen", address: "s13731984233@163.com")
+            email.from = recipient
+            email.content = """
+                昵称:\(content["name"] as? String ?? "")\n
+                手机号:\(content["mobile"] as? String ?? "")\n
+                订单号:\(content["tradeNo"] as? String ?? "")\n
+                时间:\(time)\n
+                邮箱:\(content["email"] as? String ?? "")\n
+                UUID:\(content["uuid"] as? String ?? "")\n
+            """
+            email.to.append(Recipient(name: "shiwenwenDev", address: "shiwenwendevelop@163.com"))
+            //email.cc.append(Recipient(name: "shiwenwenQQ", address: "1152164614@qq.com"))
+            //email.attachments.append("./webroot/01.png")
+            do{
+                try email.send(completion: { (code, header, body) in
+                    print(code)
+                    print(header)
+                    print(body)
+                })
+            }catch let error {
+                print(error)
+            }
         }
     }
     
@@ -241,5 +280,11 @@ struct LoginRegister {
             return route
         }
         
+    }
+ 
+    /// 确认注册信息
+    struct ConfirmationOfRegistrationInformation {
+    
+    
     }
 }
