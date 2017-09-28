@@ -8,9 +8,9 @@
 import MySQLStORM
 import StORM
 class BlackList: MySQLStORM {
-    
-    var errorCount : Int = 0
+    var id : Int = 0
     var uuid : String = ""
+    var errorCount : Int = 0
     override init(){
         super.init()
     }
@@ -18,6 +18,7 @@ class BlackList: MySQLStORM {
         return Sql_BlackList_tblle
     }
     override func to(_ this: StORMRow) {
+        id = Int("\(this.data["id"]!)")!
         errorCount = Int("\( this.data["errorCount"]!)")!
         uuid = this.data["uuid"] as? String ?? ""
     }

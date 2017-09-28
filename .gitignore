@@ -68,7 +68,10 @@ Packages/
 SpeedPlayer.xcodeproj
 Tests/
 webroot/.idea/
+.idea/
 Package.pins
 buildlinux
 files
 PADockerfile_build
+StORMlog.txt
+data/tradeNo

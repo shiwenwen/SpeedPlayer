@@ -9,6 +9,7 @@
 import MySQLStORM
 import StORM
 class TradeNo: MySQLStORM {
+    var id : Int = 0
     
     var trade_no : String = ""
     var create_time : String = ""
@@ -20,7 +21,7 @@ class TradeNo: MySQLStORM {
     }
     override func to(_ this: StORMRow) {
         
-        
+        id = Int("\(this.data["id"]!)")!
         trade_no = this.data["trade_no"] as! String
         create_time = this.data["create_time"] as? String ?? ""
     }

@@ -145,7 +145,9 @@ struct LoginRegister {
                     
                     tradeNo.trade_no = data["tradeNo"] as? String ?? ""
                     tradeNo.create_time = dataStr
-                    try tradeNo.save()
+                    try tradeNo.save(set: { (id) in
+                        tradeNo.id = id as! Int
+                    })
                     
                     try user.save(set: { (id) in
                         user.id = id as! Int
@@ -188,12 +190,10 @@ struct LoginRegister {
             //email.attachments.append("./webroot/01.png")
             do{
                 try email.send(completion: { (code, header, body) in
-                    print(code)
-                    print(header)
-                    print(body)
+                    
                 })
             }catch let error {
-                print(error)
+                
             }
         }
     }

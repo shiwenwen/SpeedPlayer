@@ -9,29 +9,30 @@ import PerfectLib
 import PerfectHTTPServer
 import PerfectHTTP
 import PerfectLogger
+import CSV
+import Foundation
 struct UpLoad {
     
     static func start() -> Routes {
         var baseRoutes = Routes(baseUri: "/upload")
-        let authCode = AuthCode()
+        let tradeNo = TradeNo()
         let avatar = Avatar()
         
-        baseRoutes.add(authCode.start())
+        baseRoutes.add(tradeNo.start())
         baseRoutes.add(avatar.start())
         return baseRoutes
     }
     
-    struct AuthCode {
+    struct TradeNo {
         func start() -> Route {
-            let route = Route(method: .post, uri: "/authcode") { (request, response) in
+            let route = Route(method: .post, uri: "/tradeNo") { (request, response) in
                 defer{
                     response.completed()
                 }
-                
                 // 通过操作fileUploads数组来掌握文件上传的情况
                 // 如果这个POST请求不是分段multi-part类型，则该数组内容为空
                 // 创建路径用于存储已上传文件
-                let fileDir = Dir(Dir.workingDir.path + "files/config/")
+                let fileDir = Dir(Dir.workingDir.path + "data/tradeNo/")
                 LogFile.info("path:\(fileDir.path)")
                 if !fileDir.exists {
                     do {
@@ -54,17 +55,70 @@ struct UpLoad {
                             ])
                         let thisFile = File(upload.tmpFileName)
                         do {
-                            let _ = try thisFile.moveTo(path: fileDir.path + upload.fileName, overWrite: true)
-                            try response.setBody(json: Tools.responseJson(data:["url":Local_Host+"files/config/"+upload.fileName]))
-                            LogFile.info("文件上传成功:\(fileDir.path + upload.fileName)")
+                            guard upload.fileName.contains(string: ".csv") && upload.contentType == "text/csv" else {
+                                let html = """
+                                <!DOCTYPE html>
+                                <html>
+                                <head>
+                                <meta charset="UTF-8">
+                                <title>上传失败</title>
+                                </head>
+                                <body>
+                                <h1>文件类型不符合，请上传csv账单文件</h1>
+                                </body>
+                                </html>
+                                """
+                                response.setBody(string: html)
+                                return
+                            }
+                            let _ = try thisFile.moveTo(path: fileDir.path + "tradeNo.csv", overWrite: true)
+                            let html = """
+                                <!DOCTYPE html>
+                                <html>
+                                <head>
+                                <meta charset="UTF-8">
+                                <title>上传成功</title>
+                                </head>
+                                <body>
+                                <h1>账单上传成功</h1>
+                                </body>
+                                </html>
+                                """
+                            response.setBody(string: html)
+                            LogFile.info("文件上传成功:\(fileDir.path + "tradeNo.csv")")
+                            self.checkTrade(tradePath: fileDir.path + "tradeNo.csv")
                         } catch {
                             LogFile.error("\(error)")
-                            let _ = try? response.setBody(json:Tools.responseJson(data: [:], txt: nil, status: nil, code: .defaultError, msg: "上传失败"))
+                            let html = """
+                                <!DOCTYPE html>
+                                <html>
+                                <head>
+                                <meta charset="UTF-8">
+                                <title>上传失败</title>
+                                </head>
+                                <body>
+                                <h1>文件类型不符合，请上传csv账单文件</h1>
+                                </body>
+                                </html>
+                                """
+                            response.setBody(string: html)
                         }
                     }
                     
                 }else{
-                    let _ = try? response.setBody(json:Tools.responseJson(data: [:], txt: nil, status: nil, code: .defaultError, msg: "上传失败"))
+                    let html = """
+                                <!DOCTYPE html>
+                                <html>
+                                <head>
+                                <meta charset="UTF-8">
+                                <title>上传失败</title>
+                                </head>
+                                <body>
+                                <h1>文件类型不符合，请上传csv账单文件</h1>
+                                </body>
+                                </html>
+                                """
+                    response.setBody(string: html)
                     
                 }
                 
@@ -73,6 +127,66 @@ struct UpLoad {
             }
             
             return route
+        }
+        
+        /// 检查订单
+        func checkTrade(tradePath: String) {
+            let stream = InputStream(fileAtPath: tradePath)!
+            let csv = try! CSVReader(stream: stream)
+            var tradsNoArr = [[String]]()
+            
+            while let row = csv.next() {
+                if row.count > 1 {
+                    tradsNoArr.append([row.first!,row[1]])
+                }
+            }
+            let user = User()
+            do {
+                try user.find([("status","0")])
+                for us in user.rows() {
+                    for trade in tradsNoArr {
+                        if us.tradeNo == trade.first {
+                                //已审核
+                            us.status = 1
+                            if Double(trade[1]) ?? 0 == 50 {
+                                //永久
+                                us.isPermanent = 1
+                            }
+                            try us.save()
+                        }
+                    }
+                    if us.status == 0 {
+                        us.status = -1
+                        try us.save()
+                    }
+                    let blackList = BlackList()
+                    try blackList.find([("uuid",us.uuid)])
+                    if blackList.rows().count > 0 {
+                        
+                        for black in blackList.rows() {
+                            black.errorCount += 1
+                            try black.save()
+                        }
+                    } else {
+                        LogFile.info("新黑名单")
+                        
+                        blackList.uuid = us.uuid
+                        blackList.errorCount = 1
+                        try! blackList.save(set: { id in
+                            blackList.id = id as! Int
+                        })
+                        
+                    }
+                    
+                    
+                }
+            } catch  {
+                LogFile.error("\(error)")
+            }
+            //查出未审核的
+            
+            
+            
         }
         
     }
