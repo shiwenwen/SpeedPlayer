@@ -178,12 +178,12 @@ struct LoginRegister {
             let recipient = Recipient(name: "shiwenwen", address: "s13731984233@163.com")
             email.from = recipient
             email.content = """
-                昵称:\(content["name"] as? String ?? "")\n
-                手机号:\(content["mobile"] as? String ?? "")\n
-                订单号:\(content["tradeNo"] as? String ?? "")\n
-                时间:\(time)\n
-                邮箱:\(content["email"] as? String ?? "")\n
-                UUID:\(content["uuid"] as? String ?? "")\n
+                昵称:\(content["name"] as? String ?? "")\n<br/>
+                手机号:\(content["mobile"] as? String ?? "")\n<br/>
+                订单号:\(content["tradeNo"] as? String ?? "")\n<br/>
+                时间:\(time)\n<br/>
+                邮箱:\(content["email"] as? String ?? "")\n<br/>
+                UUID:\(content["uuid"] as? String ?? "")
             """
             email.to.append(Recipient(name: "shiwenwenDev", address: "shiwenwendevelop@163.com"))
             //email.cc.append(Recipient(name: "shiwenwenQQ", address: "1152164614@qq.com"))
@@ -193,7 +193,7 @@ struct LoginRegister {
                     
                 })
             }catch let error {
-                
+                LogFile.error("\(error)")
             }
         }
     }
