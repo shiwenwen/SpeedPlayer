@@ -30,17 +30,9 @@ class VideoCollect: MySQLStORM {
         return Sql_Collects_table
     }
     override func to(_ this: StORMRow) {
-        if this.data["id"] is Int64 {
-            id = Int(this.data["id"] as! Int64)
-        }else{
-            id = this.data["id"] as! Int
-        }
-        if this.data["userId"] is Int64 {
-            userId = Int(this.data["id"] as! Int64)
-        }else{
-            userId = this.data["userId"] as! Int
-        }
-   
+
+        id = Int("\(this.data["id"]!)")!
+        userId = Int("\(this.data["userId"]!)")!
         videoId = this.data["videoId"] as! String
         barcode = this.data["barcode"] as! String
         title = this.data["title"] as! String

@@ -26,12 +26,7 @@ class User: MySQLStORM {
         return Sql_Users_table
     }
     override func to(_ this: StORMRow) {
-        if this.data["id"] is Int64 {
-            id = Int(this.data["id"] as! Int64)
-        }else{
-            id = this.data["id"] as! Int
-        }
-        
+        id = Int("\(this.data["id"]!)")!
         name = this.data["name"] as! String
         mobile = this.data["mobile"] as! String
         password = this.data["password"] as! String
@@ -41,16 +36,8 @@ class User: MySQLStORM {
         avatar = avatar.characters.count < 1 ? "nil" : avatar
         create_time = this.data["create_time"] as? String ?? ""
         recharge_time = this.data["recharge_time"] as? String ?? ""
-        if this.data["isPermanent"] is Int32 {
-            isPermanent = Int(this.data["isPermanent"] as! Int32)
-        }else{
-            isPermanent = this.data["isPermanent"] as! Int
-        }
-        if this.data["status"] is Int32 {
-            status = Int(this.data["status"] as! Int32)
-        }else{
-            status = this.data["status"] as! Int
-        }
+        isPermanent = Int("\(this.data["isPermanent"]!)")!
+        status = Int("\(this.data["status"]!)")!
         tradeNo = this.data["tradeNo"] as? String ?? ""
     }
     

@@ -18,12 +18,7 @@ class BlackList: MySQLStORM {
         return Sql_BlackList_tblle
     }
     override func to(_ this: StORMRow) {
-        if this.data["errorCount"] is Int32 {
-            errorCount = Int(this.data["errorCount"] as! Int32)
-        }else{
-            errorCount = this.data["errorCount"] as! Int
-        }
-        
+        errorCount = Int("\( this.data["errorCount"]!)")!
         uuid = this.data["uuid"] as? String ?? ""
     }
     

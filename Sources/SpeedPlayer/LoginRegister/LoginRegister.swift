@@ -50,7 +50,7 @@ struct LoginRegister {
                         try response.setBody(json:body)
                         return;
                     }
-                    if user.rows().first!.status < 1 {
+                    if user.rows().first!.status < 0 {
                         let body = Tools.responseJson(data: [:], txt: "该账号使用了错误的订单号,已经被禁用!", status:.forbidden)
                         try response.setBody(json:body)
                         return;
