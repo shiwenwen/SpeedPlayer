@@ -147,7 +147,7 @@ struct VideoCollects {
                 
                 
                 do{
-                    let collectsArray = data["collects"] as! [[String:Any]]
+                    let collectsArray = data["collects"] as? [[String:Any]] ?? []
                     for col in collectsArray {
                         let userId = col["userId"] as? Int ?? 0
                         let videoId = col["videoId"] as? String ?? ""
@@ -207,8 +207,8 @@ struct VideoCollects {
                 }
                 let json = try! request.postParams.first!.0.jsonDecode() as! [String:Any]
                 let data = json["data"] as! [String:Any]
-                let userId = data["userId"] as! Int
-                let videoId = data["videoId"] as! String
+                let userId = data["userId"] as? Int ?? 0
+                let videoId = data["videoId"] as? String ?? ""
                 do{
                     let videoCollect = VideoCollect()
                     try videoCollect.find([("userId","\(userId)"),("videoId",videoId)])
