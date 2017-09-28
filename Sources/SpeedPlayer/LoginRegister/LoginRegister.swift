@@ -51,14 +51,12 @@ struct LoginRegister {
                         try response.setBody(json:body)
                         return;
                     }
-                    try user.find([("uuid",data["uuid"] ?? "")])
                     var isRegsitDevice = false
                     for us in user.rows() {
                         if us.uuid == data["uuid"] as! String {
                             isRegsitDevice = true
                         }
                     }
-                    try user.find([("mobile",data["mobile"] ?? "")])
                     if isRegsitDevice || (data["reset"] as? Int ?? 1) == 1{
                         let account =  user.rows().first!
                         if account.password == data["password"] as! String {

@@ -24,12 +24,7 @@ class User: MySQLStORM {
         return Sql_Users_table
     }
     override func to(_ this: StORMRow) {
-        if this.data["id"] is Int64 {
-            id = Int(this.data["id"] as! Int64)
-        }else{
-            id = this.data["id"] as! Int
-        }
-        
+        id = Int("\(this.data["id"]!)")!
         name = this.data["name"] as! String
         mobile = this.data["mobile"] as! String
         password = this.data["password"] as! String

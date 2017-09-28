@@ -19,16 +19,9 @@ class AuthCode: MySQLStORM {
         return Sql_AuthCodes_table
     }
     override func to(_ this: StORMRow) {
-        if this.data["id"] is Int64 {
-            id = Int(this.data["id"] as! Int64)
-        }else{
-            id = this.data["id"] as! Int
-        }
-        if this.data["status"] is Int32 {
-            status = Int(this.data["status"] as! Int32)
-        }else{
-            status = this.data["status"] as! Int
-        }
+        
+        id = Int("\(this.data["id"]!)")!
+        status = Int("\(this.data["status"]!)")!
         
         authCode = this.data["authCode"] as! String
     }
