@@ -59,7 +59,7 @@ struct LoginRegister {
                     }
                     if isRegsitDevice || (data["reset"] as? Int ?? 1) == 1{
                         let account =  user.rows().first!
-                        if account.password == data["password"] as! String {
+                        if account.password == data["password"] as? String {
                             let body = Tools.responseJson(data: ["mobile":account.mobile,"name":account.name,"userId":account.id], txt: "登录成功", status:.success)
                             try response.setBody(json:body)
                             account.uuid = data["uuid"] as! String

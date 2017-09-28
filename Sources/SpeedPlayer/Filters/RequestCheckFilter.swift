@@ -24,7 +24,7 @@ struct RequestCheckFilter: HTTPRequestFilter {
             }
             //校验参数格式
 //            LogFile.debug("postParams:\(request.postParams)")
-            guard let params = request.postParams.first,let json = try? params.0.jsonDecode() as! [String:Any] else {
+            guard let params = request.postParams.first,let jsonDecode = try? params.0.jsonDecode(),let json = jsonDecode as? [String:Any] else {
                 let body = Tools.responseJson(data: [:], txt: nil, status: nil, code: .requestParamsError, msg: "请求参数格式错误")
                 LogFile.debug("\(body)")
                 do {
