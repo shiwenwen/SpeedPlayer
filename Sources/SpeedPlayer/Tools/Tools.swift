@@ -9,6 +9,9 @@ import PerfectLib
 import PerfectCrypto
 import PerfectLogger
 import PerfectHTTP
+import Foundation
+
+
 let HandleSuccessTxt = "处理成功"
 let HandleFailedTxt = "处理失败"
 let ResponseSuccessMsg = "请求成功"
@@ -74,7 +77,7 @@ class Tools {
             return false
             
         }
-        if paramsString.count < 2 {
+        if paramsString < 2 {
             return false
         }
         paramsString.remove(at: paramsString.startIndex)
