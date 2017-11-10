@@ -17,18 +17,18 @@
 //let Sql_db = "MyAppDB"
 //
 //MARK: 生产
-let Local_Host = "http://47.94.175.119:8181"
-let Sql_Host = "127.0.0.1"
-let Sql_user = "root"
-let Sql_passwoed = "sww"
-let Sql_db = "SpeedPlayer"
-
-//MARK: Product 开发
-//let Local_Host = "http://192.168.31.208:8181"
+//let Local_Host = "http://47.94.175.119:8181"
 //let Sql_Host = "127.0.0.1"
 //let Sql_user = "root"
 //let Sql_passwoed = "sww"
-//let Sql_db = "SpeedPlayerProduct"
+//let Sql_db = "SpeedPlayer"
+
+//MARK: Product 开发
+let Local_Host = "http://192.168.31.208:8181"
+let Sql_Host = "127.0.0.1"
+let Sql_user = "root"
+let Sql_passwoed = "sww"
+let Sql_db = "SpeedPlayerProduct"
 
 //MARK: Product 生产
 //let Local_Host = "http://47.94.175.119:8181"
