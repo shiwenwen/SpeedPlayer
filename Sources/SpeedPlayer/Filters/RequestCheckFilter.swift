@@ -39,7 +39,7 @@ struct RequestCheckFilter: HTTPRequestFilter {
             }
             LogFile.debug("Params:\(json)")
             //data参数校验
-            guard let _ = json["data"] as? [String:Any] else{
+            guard let data = json["data"] as? [String:Any] else{
                 let body = Tools.responseJson(data: [:], txt: nil, status: nil, code: .requestParamsError, msg: "请求参数格式错误")
                 LogFile.debug("\(body)")
                 do {
@@ -53,18 +53,18 @@ struct RequestCheckFilter: HTTPRequestFilter {
                 return
             }
             //签名校验
-            //            guard Tools.signatureVerification(params: data, sign: json["sign"] as? String) else{
-            //                let body = Tools .responseJson(data:[:], txt: nil, status:nil, code:.signError, msg: "签名错误")
-            //                LogFile.debug("\(body)")
-            //                do {
-            //                    try response.setBody(json: body)
-            //                } catch {
-            //                    LogFile.error("\(error)")
-            //                }
-            //                response.completed()
-            //                callback(.halt(request, response))
-            //                return
-            //            }
+            guard Tools.signatureVerification(params: data, sign: json["sign"] as? String) else{
+                let body = Tools .responseJson(data:[:], txt: nil, status:nil, code:.signError, msg: "签名错误")
+                LogFile.debug("\(body)")
+                do {
+                    try response.setBody(json: body)
+                } catch {
+                    LogFile.error("\(error)")
+                }
+                response.completed()
+                callback(.halt(request, response))
+                return
+            }
             callback(.continue(request, response))
         }else{
             //GET

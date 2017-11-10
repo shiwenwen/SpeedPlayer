@@ -1,5 +1,5 @@
 // Generated automatically by Perfect Assistant Application
-// Date: 2017-09-28 03:18:50 +0000
+// Date: 2017-11-08 06:01:43 +0000
 import PackageDescription
 let package = Package(
 	name: "SpeedPlayer",
