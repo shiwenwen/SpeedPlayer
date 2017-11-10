@@ -5,7 +5,6 @@
 //  Created by 石文文 on 2016/11/9.
 //
 //
-import MySQL
 import PerfectLib
 import PerfectCrypto
 import PerfectLogger
@@ -68,26 +67,36 @@ class Tools {
     ///   - params: params
     ///   - sign: sign
     /// - Returns: signature verification result
-    class func signatureVerification(params:[String:Any]?,sign:String?) -> Bool{
+    class func signatureVerification(paramsString:String, sign:String?) -> Bool{
+        var paramsString = paramsString
         guard sign != nil else {
             
             return false
             
         }
-        if let paramsString = try? params.jsonEncodedString() {
-            guard let md5Byte = (paramsString + MD5_KEY).digest(.md5),let md5 = String(validatingUTF8:md5Byte) else {
-                return false
-            }
-            LogFile.info("originString = \(paramsString)---sign = \(md5)")
-            if md5 != sign{
-                
-                return false
-            }
-            
-        }else {
+        if paramsString.count < 2 {
+            return false
+        }
+        paramsString.remove(at: paramsString.startIndex)
+        paramsString.remove(at: paramsString.index(before: paramsString.endIndex))
+        
+        guard let range1 = paramsString.range(of: "{") else {
+            return false
+        }
+        paramsString.removeSubrange(paramsString.startIndex ..< range1.lowerBound)
+        guard let range2 = paramsString.range(of: "}", options: String.CompareOptions.backwards, range: nil, locale: nil) else {
+            return false
+        }
+        paramsString.removeSubrange(range2.upperBound ..< paramsString.endIndex)
+        guard let md5Byte = (paramsString + MD5_KEY).digest(.md5), let hexBytes = md5Byte.encode(.hex), let md5 = String(validatingUTF8:hexBytes) else {
+            return false
+        }
+        LogFile.info("originString = \(paramsString)---sign = \(md5)")
+        if md5 != sign{
             
             return false
         }
+        
         return true
     }
     
@@ -98,7 +107,7 @@ enum SqlError : Error {
     case insert(Int32, String)
     
 }
-
+/*
 extension MySQL {
     
     /// insert data to MySQL
@@ -170,6 +179,7 @@ extension MySQL {
     
     
 }
+ */
 extension HTTPResponse {
     @discardableResult
     func setBodyNullable(json: JSONConvertible, skipContentType: Bool = false) throws -> Self {
