@@ -69,7 +69,7 @@ class Tools {
     ///   - sign: sign
     /// - Returns: signature verification result
     class func signatureVerification(paramsString:String, sign:String?) -> Bool{
-        var paramsString = paramsString
+        var paramsStr = paramsString
         guard sign != nil else {
             
             return false
@@ -78,21 +78,23 @@ class Tools {
         if paramsString.count < 2 {
             return false
         }
-        paramsString.remove(at: paramsString.startIndex)
-        paramsString.remove(at: paramsString.index(before: paramsString.endIndex))
+        paramsStr.remove(at: paramsStr.startIndex)
+        paramsStr.remove(at: paramsStr.index(before: paramsStr.endIndex))
         
-        guard let range1 = paramsString.range(of: "{") else {
+        guard let range1 = paramsStr.range(of: "{") else {
             return false
         }
-        paramsString.removeSubrange(paramsString.startIndex ..< range1.lowerBound)
-        guard let range2 = paramsString.range(of: "}", options: String.CompareOptions.backwards, range: nil, locale: nil) else {
+        paramsStr.removeSubrange(paramsStr.startIndex ..< range1.lowerBound)
+        guard let range2 = paramsStr.range(of: "}", options: String.CompareOptions.backwards, range: nil, locale: nil) else {
             return false
         }
-        paramsString.removeSubrange(range2.upperBound ..< paramsString.endIndex)
-        guard let md5Byte = (paramsString + MD5_KEY).digest(.md5), let hexBytes = md5Byte.encode(.hex), let md5 = String(validatingUTF8:hexBytes) else {
+        paramsStr.removeSubrange(range2.upperBound ..< paramsStr.endIndex)
+        let parStr = paramsStr.replacingOccurrences(of: "\\/", with: "/").replacingOccurrences(of: " ", with: "") + MD5_KEY
+        
+        guard let md5Byte = parStr.digest(.md5), let hexBytes = md5Byte.encode(.hex), let md5 = String(validatingUTF8:hexBytes) else {
             return false
         }
-        LogFile.info("originString = \(paramsString)---sign = \(md5)")
+        LogFile.info("originString = \(parStr)---sign = \(md5)")
         if md5 != sign{
             
             return false
