@@ -32,7 +32,7 @@ class User: MySQLStORM {
         uuid = this.data["uuid"] as? String ?? ""
         email = this.data["email"] as! String
         avatar = this.data["avatar"] as? String ?? "nil"
-        avatar = avatar.characters.count < 1 ? "nil" : avatar
+        avatar = avatar.count < 1 ? "nil" : avatar
         create_time = this.data["create_time"] as? String ?? ""
     }
     
